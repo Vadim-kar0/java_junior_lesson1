@@ -93,29 +93,41 @@ public class Cart<T extends Food> {
     }
 
     public void cardBalancingV2(){
-        int[] count = {0};
-        boolean proteins = false;
-        boolean fats = false;
-        boolean carbohydrates = false;
-        if (foodstuffs.stream().noneMatch(Food::getProteins)){
-            boolean addProteins = foodstuffs.add((T) market.getThings(Food.class).stream()
-                    .filter(food -> food.getProteins()).findAny().get());
-        } else {
-            proteins = true;
+        boolean proteins = foodstuffs.stream().anyMatch(Food::getProteins);
+        boolean fats = foodstuffs.stream().anyMatch(Food::getFats);
+        boolean carbohydrates = foodstuffs.stream().anyMatch(Food::getCarbohydrates);
+        if(proteins && fats && carbohydrates){
+            System.out.println("Корзина уже сбалансирована по БЖУ.");
+            return;
         }
-        if (foodstuffs.stream().noneMatch(Food::getFats)){
-            boolean addFats = foodstuffs.add((T) market.getThings(Food.class).stream()
-                    .filter(food -> food.getFats()).findAny().get());
+        System.out.println("Начинаем балансировать корзину по БЖУ");
+        if(!checkMarketByFood()){
+            System.out.println("Невозможно сбалансировать корзину по БЖУ.");
         } else {
-            fats = true;
-        }
-        if (foodstuffs.stream().noneMatch(Food::getCarbohydrates)){
-            boolean addFats = foodstuffs.add((T) market.getThings(Food.class).stream()
-                    .filter(food -> food.getCarbohydrates()).findAny().get());
-        } else {
-            carbohydrates = true;
+            if (!proteins){
+                boolean addProteins = foodstuffs.add((T) market.getThings(Food.class).stream()
+                        .filter(food -> food.getProteins()).findAny().get());
+            }
+            if (!fats){
+                boolean addFats = foodstuffs.add((T) market.getThings(Food.class).stream()
+                        .filter(food -> food.getFats()).findAny().get());
+            }
+            if (!carbohydrates){
+                boolean addFats = foodstuffs.add((T) market.getThings(Food.class).stream()
+                        .filter(food -> food.getCarbohydrates()).findAny().get());
+            }
+            System.out.println("Корзина сбалансирована по БЖУ.");
         }
 
+
+
+    }
+
+    private boolean checkMarketByFood(){
+        boolean proteins = market.getThings(Food.class).stream().anyMatch(Food::getProteins);
+        boolean fats = market.getThings(Food.class).stream().anyMatch(Food::getFats);
+        boolean carbohydrates = market.getThings(Food.class).stream().anyMatch(Food::getCarbohydrates);
+        return proteins && fats && carbohydrates;
     }
 
 
